@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ES2022",
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "newLine": "LF",
+    "sourceMap": true,
+    "declarationMap": true,
+    "outDir": "dist",
+    "rootDirs": ["lib", "test"],
+    "declaration": true,
+  },
+  "include": [
+    "lib/**/*.ts",
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".git"
+  ],
+}

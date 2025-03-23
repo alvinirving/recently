@@ -1,0 +1,19 @@
+{# @pebvariable name="op" type="org.openapitools.codegen.CodegenOperation" #}
+        const form = new FormData();
+{% for param in op.formParams -%}
+        {% if param.isFile -%}
+        form.append("{{param.paramName}}", {{param.paramName}}); // file
+        {% else -%}
+        form.append("{{param.paramName}}", String({{param.paramName}}));
+        {% endif -%}
+{% endfor %}
+        const res = await this.httpClient.{{op.httpMethod|lower}}{% if op.hasFormParams %}Form{% endif %}Multipart(
+            "{{op.path}}"
+{% for param in op.pathParams -%}
+                    .replace("{{ "{" + param.paramName + "}" }}", String({{ param.paramName }}))
+{% endfor %},
+            form,
+        );
+        const text = await res.text();
+        const parsedBody = text ? JSON.parse(text) : null;
+        return { httpResponse: res, body: parsedBody };

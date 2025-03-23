@@ -1,0 +1,54 @@
+{# @pebvariable name="op" type="org.openapitools.codegen.CodegenOperation" #}
+
+{% if op.isResponseFile %}
+        const response = await this.httpClient.{{op.httpMethod|lower}}("{{op.path}}"
+        {% for param in op.pathParams %}
+            .replace('{' + "{{param.baseName}}" + '}', String({{param.paramName}}))
+        {% endfor %}
+        );
+        return {httpResponse: response, body: convertResponseToReadable(response)};
+{% else %}
+    {% if op.hasBodyParam %}const params = {{op.bodyParam.paramName}};
+    {% elseif op.hasFormParams %}const formParams = {
+        {% for param in op.formParams -%}
+            "{{param.baseName}}": {{param.paramName}},
+        {% endfor %}
+        };
+        Object.keys(formParams).forEach((key: keyof typeof formParams) => {
+          if (formParams[key] === undefined) {
+            delete formParams[key];
+          }
+        });
+    {% elseif op.hasQueryParams %}const queryParams = {
+        {% for param in op.queryParams -%}
+            "{{param.paramName}}": {{param.paramName}},
+        {% endfor %}
+        };
+        Object.keys(queryParams).forEach((key: keyof typeof queryParams) => {
+          if (queryParams[key] === undefined) {
+            delete queryParams[key];
+          }
+        });
+    {% endif %}
+    {% if op.hasHeaderParams %}const headerParams = {
+        {% for param in op.headerParams -%}
+            ...({{ param.paramName }} != null ? {"{{param.baseName}}": {{param.paramName}}} : {}),
+        {% endfor %}
+        };
+    {% endif %}
+
+        const res = await this.httpClient.{{op.httpMethod|lower}}{% if op.hasFormParams %}Form{% endif %}{% if op.isMultipart %}Multipart{% endif %}{% if op.hasBodyParam and op.bodyParam.isFile %}BinaryContent{% endif %}(
+            "{{ op.path }}"
+        {% for param in op.pathParams %}
+                .replace("{{ "{" + param.paramName + "}" }}", String({{ param.paramName }}))
+        {% endfor %},
+
+            {% if op.hasBodyParam %}params,
+            {% elseif op.hasFormParams %}formParams,
+            {% elseif op.hasQueryParams %}queryParams,{% endif %}
+            {% if op.hasHeaderParams %}{headers: headerParams},{% endif %}
+        );
+        const text = await res.text();
+        const parsedBody = text ? JSON.parse(text) : null;
+        return { httpResponse: res, body: parsedBody };
+{% endif %}
