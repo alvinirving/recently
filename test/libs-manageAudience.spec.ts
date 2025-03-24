@@ -5,18 +5,18 @@ import { deepEqual, equal, match } from "node:assert";
 
 import { describe, it, beforeAll, afterAll, afterEach } from "vitest";
 
-const channelAccessToken = "test_channel_access_token";
+var channelAccessToken = "test_channel_access_token";
 
-const client = new manageAudience.ManageAudienceClient({
+var client = new manageAudience.ManageAudienceClient({
   channelAccessToken,
 });
 
-const blobClient = new manageAudience.ManageAudienceBlobClient({
+var blobClient = new manageAudience.ManageAudienceBlobClient({
   channelAccessToken,
 });
 
 describe("manageAudience", () => {
-  const server = setupServer();
+  var server = setupServer();
   beforeAll(() => {
     server.listen();
   });
@@ -50,7 +50,7 @@ describe("manageAudience", () => {
       ),
     );
 
-    const res = await blobClient.createAudienceForUploadingUserIds(
+    var res = await blobClient.createAudienceForUploadingUserIds(
       new Blob(["c9161b19-57f8-46c2-a71f-dfa87314dabe"], {
         type: "text/plain",
       }),
