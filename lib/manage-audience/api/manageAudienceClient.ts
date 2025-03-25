@@ -51,7 +51,7 @@ export class ManageAudienceClient {
   private httpClient: HTTPFetchClient;
 
   constructor(config: httpClientConfig) {
-    const baseURL = config.baseURL || "https://api.line.me";
+    var baseURL = config.baseURL || "https://api.line.me";
     this.httpClient = new HTTPFetchClient({
       defaultHeaders: {
         Authorization: "Bearer " + config.channelAccessToken,
@@ -61,7 +61,7 @@ export class ManageAudienceClient {
   }
 
   private async parseHTTPResponse(response: Response) {
-    const { LINE_REQUEST_ID_HTTP_HEADER_NAME } = Types;
+    var { LINE_REQUEST_ID_HTTP_HEADER_NAME } = Types;
     let resBody: Record<string, any> = {
       ...(await response.json()),
     };
@@ -95,14 +95,14 @@ export class ManageAudienceClient {
   public async activateAudienceGroupWithHttpInfo(
     audienceGroupId: number,
   ): Promise<Types.ApiResponseType<Types.MessageAPIResponseBase>> {
-    const res = await this.httpClient.put(
+    var res = await this.httpClient.put(
       "/v2/bot/audienceGroup/{audienceGroupId}/activate".replace(
         "{audienceGroupId}",
         String(audienceGroupId),
       ),
     );
-    const text = await res.text();
-    const parsedBody = text ? JSON.parse(text) : null;
+    var text = await res.text();
+    var parsedBody = text ? JSON.parse(text) : null;
     return { httpResponse: res, body: parsedBody };
   }
   /**
@@ -131,14 +131,14 @@ export class ManageAudienceClient {
   public async addAudienceToAudienceGroupWithHttpInfo(
     addAudienceToAudienceGroupRequest: AddAudienceToAudienceGroupRequest,
   ): Promise<Types.ApiResponseType<Types.MessageAPIResponseBase>> {
-    const params = addAudienceToAudienceGroupRequest;
+    var params = addAudienceToAudienceGroupRequest;
 
-    const res = await this.httpClient.put(
+    var res = await this.httpClient.put(
       "/v2/bot/audienceGroup/upload",
       params,
     );
-    const text = await res.text();
-    const parsedBody = text ? JSON.parse(text) : null;
+    var text = await res.text();
+    var parsedBody = text ? JSON.parse(text) : null;
     return { httpResponse: res, body: parsedBody };
   }
   /**
@@ -165,14 +165,14 @@ export class ManageAudienceClient {
   public async createAudienceGroupWithHttpInfo(
     createAudienceGroupRequest: CreateAudienceGroupRequest,
   ): Promise<Types.ApiResponseType<CreateAudienceGroupResponse>> {
-    const params = createAudienceGroupRequest;
+    var params = createAudienceGroupRequest;
 
-    const res = await this.httpClient.post(
+    var res = await this.httpClient.post(
       "/v2/bot/audienceGroup/upload",
       params,
     );
-    const text = await res.text();
-    const parsedBody = text ? JSON.parse(text) : null;
+    var text = await res.text();
+    var parsedBody = text ? JSON.parse(text) : null;
     return { httpResponse: res, body: parsedBody };
   }
   /**
@@ -201,14 +201,14 @@ export class ManageAudienceClient {
   public async createClickBasedAudienceGroupWithHttpInfo(
     createClickBasedAudienceGroupRequest: CreateClickBasedAudienceGroupRequest,
   ): Promise<Types.ApiResponseType<CreateClickBasedAudienceGroupResponse>> {
-    const params = createClickBasedAudienceGroupRequest;
+    var params = createClickBasedAudienceGroupRequest;
 
-    const res = await this.httpClient.post(
+    var res = await this.httpClient.post(
       "/v2/bot/audienceGroup/click",
       params,
     );
-    const text = await res.text();
-    const parsedBody = text ? JSON.parse(text) : null;
+    var text = await res.text();
+    var parsedBody = text ? JSON.parse(text) : null;
     return { httpResponse: res, body: parsedBody };
   }
   /**
@@ -237,11 +237,11 @@ export class ManageAudienceClient {
   public async createImpBasedAudienceGroupWithHttpInfo(
     createImpBasedAudienceGroupRequest: CreateImpBasedAudienceGroupRequest,
   ): Promise<Types.ApiResponseType<CreateImpBasedAudienceGroupResponse>> {
-    const params = createImpBasedAudienceGroupRequest;
+    var params = createImpBasedAudienceGroupRequest;
 
-    const res = await this.httpClient.post("/v2/bot/audienceGroup/imp", params);
-    const text = await res.text();
-    const parsedBody = text ? JSON.parse(text) : null;
+    var res = await this.httpClient.post("/v2/bot/audienceGroup/imp", params);
+    var text = await res.text();
+    var parsedBody = text ? JSON.parse(text) : null;
     return { httpResponse: res, body: parsedBody };
   }
   /**
@@ -266,14 +266,14 @@ export class ManageAudienceClient {
   public async deleteAudienceGroupWithHttpInfo(
     audienceGroupId: number,
   ): Promise<Types.ApiResponseType<Types.MessageAPIResponseBase>> {
-    const res = await this.httpClient.delete(
+    var res = await this.httpClient.delete(
       "/v2/bot/audienceGroup/{audienceGroupId}".replace(
         "{audienceGroupId}",
         String(audienceGroupId),
       ),
     );
-    const text = await res.text();
-    const parsedBody = text ? JSON.parse(text) : null;
+    var text = await res.text();
+    var parsedBody = text ? JSON.parse(text) : null;
     return { httpResponse: res, body: parsedBody };
   }
   /**
@@ -298,14 +298,14 @@ export class ManageAudienceClient {
   public async getAudienceDataWithHttpInfo(
     audienceGroupId: number,
   ): Promise<Types.ApiResponseType<GetAudienceDataResponse>> {
-    const res = await this.httpClient.get(
+    var res = await this.httpClient.get(
       "/v2/bot/audienceGroup/{audienceGroupId}".replace(
         "{audienceGroupId}",
         String(audienceGroupId),
       ),
     );
-    const text = await res.text();
-    const parsedBody = text ? JSON.parse(text) : null;
+    var text = await res.text();
+    var parsedBody = text ? JSON.parse(text) : null;
     return { httpResponse: res, body: parsedBody };
   }
   /**
@@ -326,11 +326,11 @@ export class ManageAudienceClient {
   public async getAudienceGroupAuthorityLevelWithHttpInfo(): Promise<
     Types.ApiResponseType<GetAudienceGroupAuthorityLevelResponse>
   > {
-    const res = await this.httpClient.get(
+    var res = await this.httpClient.get(
       "/v2/bot/audienceGroup/authorityLevel",
     );
-    const text = await res.text();
-    const parsedBody = text ? JSON.parse(text) : null;
+    var text = await res.text();
+    var parsedBody = text ? JSON.parse(text) : null;
     return { httpResponse: res, body: parsedBody };
   }
   /**
@@ -384,7 +384,7 @@ export class ManageAudienceClient {
     includesExternalPublicGroups?: boolean,
     createRoute?: AudienceGroupCreateRoute,
   ): Promise<Types.ApiResponseType<GetAudienceGroupsResponse>> {
-    const queryParams = {
+    var queryParams = {
       page: page,
       description: description,
       status: status,
@@ -398,12 +398,12 @@ export class ManageAudienceClient {
       }
     });
 
-    const res = await this.httpClient.get(
+    var res = await this.httpClient.get(
       "/v2/bot/audienceGroup/list",
       queryParams,
     );
-    const text = await res.text();
-    const parsedBody = text ? JSON.parse(text) : null;
+    var text = await res.text();
+    var parsedBody = text ? JSON.parse(text) : null;
     return { httpResponse: res, body: parsedBody };
   }
   /**
@@ -428,14 +428,14 @@ export class ManageAudienceClient {
   public async getSharedAudienceDataWithHttpInfo(
     audienceGroupId: number,
   ): Promise<Types.ApiResponseType<GetSharedAudienceDataResponse>> {
-    const res = await this.httpClient.get(
+    var res = await this.httpClient.get(
       "/v2/bot/audienceGroup/shared/{audienceGroupId}".replace(
         "{audienceGroupId}",
         String(audienceGroupId),
       ),
     );
-    const text = await res.text();
-    const parsedBody = text ? JSON.parse(text) : null;
+    var text = await res.text();
+    var parsedBody = text ? JSON.parse(text) : null;
     return { httpResponse: res, body: parsedBody };
   }
   /**
@@ -484,7 +484,7 @@ export class ManageAudienceClient {
     size?: number,
     createRoute?: AudienceGroupCreateRoute,
   ): Promise<Types.ApiResponseType<GetSharedAudienceGroupsResponse>> {
-    const queryParams = {
+    var queryParams = {
       page: page,
       description: description,
       status: status,
@@ -497,12 +497,12 @@ export class ManageAudienceClient {
       }
     });
 
-    const res = await this.httpClient.get(
+    var res = await this.httpClient.get(
       "/v2/bot/audienceGroup/shared/list",
       queryParams,
     );
-    const text = await res.text();
-    const parsedBody = text ? JSON.parse(text) : null;
+    var text = await res.text();
+    var parsedBody = text ? JSON.parse(text) : null;
     return { httpResponse: res, body: parsedBody };
   }
   /**
@@ -531,14 +531,14 @@ export class ManageAudienceClient {
   public async updateAudienceGroupAuthorityLevelWithHttpInfo(
     updateAudienceGroupAuthorityLevelRequest: UpdateAudienceGroupAuthorityLevelRequest,
   ): Promise<Types.ApiResponseType<Types.MessageAPIResponseBase>> {
-    const params = updateAudienceGroupAuthorityLevelRequest;
+    var params = updateAudienceGroupAuthorityLevelRequest;
 
-    const res = await this.httpClient.put(
+    var res = await this.httpClient.put(
       "/v2/bot/audienceGroup/authorityLevel",
       params,
     );
-    const text = await res.text();
-    const parsedBody = text ? JSON.parse(text) : null;
+    var text = await res.text();
+    var parsedBody = text ? JSON.parse(text) : null;
     return { httpResponse: res, body: parsedBody };
   }
   /**
@@ -572,17 +572,17 @@ export class ManageAudienceClient {
     audienceGroupId: number,
     updateAudienceGroupDescriptionRequest: UpdateAudienceGroupDescriptionRequest,
   ): Promise<Types.ApiResponseType<Types.MessageAPIResponseBase>> {
-    const params = updateAudienceGroupDescriptionRequest;
+    var params = updateAudienceGroupDescriptionRequest;
 
-    const res = await this.httpClient.put(
+    var res = await this.httpClient.put(
       "/v2/bot/audienceGroup/{audienceGroupId}/updateDescription".replace(
         "{audienceGroupId}",
         String(audienceGroupId),
       ),
       params,
     );
-    const text = await res.text();
-    const parsedBody = text ? JSON.parse(text) : null;
+    var text = await res.text();
+    var parsedBody = text ? JSON.parse(text) : null;
     return { httpResponse: res, body: parsedBody };
   }
 }
