@@ -18,9 +18,9 @@ import {
 import { describe, it, beforeAll, afterAll, afterEach } from "vitest";
 import { parseForm } from "./helpers/parse-form";
 
-const channelAccessToken = "test_channel_access_token";
+var channelAccessToken = "test_channel_access_token";
 
-const client = new Client({
+var client = new Client({
   channelAccessToken,
 });
 
@@ -42,24 +42,24 @@ class MSWResult {
 
 function checkQuery(request: Request, expectedQuery: Record<string, string>) {
   if (expectedQuery) {
-    const url = new URL(request.url);
-    const queryParams = url.searchParams;
-    for (const key in expectedQuery) {
+    var url = new URL(request.url);
+    var queryParams = url.searchParams;
+    for (var key in expectedQuery) {
       equal(queryParams.get(key), expectedQuery[key]);
     }
   }
 }
-const checkInterceptionOption = (
+var checkInterceptionOption = (
   request: Request,
   interceptionOption: Record<string, string>,
 ) => {
-  for (const key in interceptionOption) {
+  for (var key in interceptionOption) {
     equal(request.headers.get(key), interceptionOption[key]);
   }
 };
 
 describe("client", () => {
-  const server = setupServer();
+  var server = setupServer();
   beforeAll(() => {
     server.listen();
   });
@@ -70,8 +70,8 @@ describe("client", () => {
     server.resetHandlers();
   });
 
-  const testMsg: Types.TextMessage = { type: "text", text: "hello" };
-  const richMenu: Types.RichMenu = {
+  var testMsg: Types.TextMessage = { type: "text", text: "hello" };
+  var richMenu: Types.RichMenu = {
     size: {
       width: 2500,
       height: 1686,
@@ -95,17 +95,17 @@ describe("client", () => {
     ],
   };
 
-  const interceptionOption: Record<string, string> = {
+  var interceptionOption: Record<string, string> = {
     authorization: `Bearer ${channelAccessToken}`,
     "User-Agent": "@line/bot-sdk/1.0.0-test",
   };
 
-  const mockGet = (
+  var mockGet = (
     prefix: string,
     path: string,
     expectedQuery?: Record<string, string>,
   ) => {
-    const result = new MSWResult();
+    var result = new MSWResult();
     server.use(
       http.get(prefix + path, ({ request }) => {
         checkInterceptionOption(request, interceptionOption);
@@ -126,25 +126,25 @@ describe("client", () => {
     return result;
   };
 
-  const mockPost = (
+  var mockPost = (
     prefix: string,
     path: string,
     expectedBody?: Record<string, any>,
   ) => {
-    const result = new MSWResult();
+    var result = new MSWResult();
     server.use(
       http.post(prefix + path, async ({ request, params, cookies }) => {
-        for (const key in interceptionOption) {
+        for (var key in interceptionOption) {
           equal(request.headers.get(key), interceptionOption[key]);
         }
 
         if (expectedBody) {
           if (Buffer.isBuffer(expectedBody)) {
-            const body = await request.blob();
+            var body = await request.blob();
             equal(body.size, expectedBody.length);
             // TODO compare content
           } else {
-            const dat = await request.json();
+            var dat = await request.json();
             ok(dat);
             deepEqual(dat, expectedBody);
           }
@@ -164,26 +164,26 @@ describe("client", () => {
     return result;
   };
 
-  const checkMultipartFormData = async (
+  var checkMultipartFormData = async (
     request: Request,
     expectedBody: Record<string, any>,
   ) => {
-    const formData = await request.formData();
+    var formData = await request.formData();
     for (let expectedBodyKey in expectedBody) {
       equal(formData.get(expectedBodyKey), expectedBody[expectedBodyKey]);
     }
   };
 
-  const mockPut = (prefix: string, path: string, expectedBody?: any) => {
-    const result = new MSWResult();
+  var mockPut = (prefix: string, path: string, expectedBody?: any) => {
+    var result = new MSWResult();
     server.use(
       http.put(prefix + path, async ({ request, params, cookies }) => {
-        for (const key in interceptionOption) {
+        for (var key in interceptionOption) {
           equal(request.headers.get(key), interceptionOption[key]);
         }
 
         if (expectedBody) {
-          const dat = await request.json();
+          var dat = await request.json();
           ok(dat);
           deepEqual(dat, expectedBody);
         }
@@ -202,15 +202,15 @@ describe("client", () => {
     return result;
   };
 
-  const mockDelete = (
+  var mockDelete = (
     prefix: string,
     path: string,
     expectedQuery?: Record<string, string>,
   ) => {
-    const result = new MSWResult();
+    var result = new MSWResult();
     server.use(
       http.delete(prefix + path, async ({ request, params, cookies }) => {
-        for (const key in interceptionOption) {
+        for (var key in interceptionOption) {
           equal(request.headers.get(key), interceptionOption[key]);
         }
 
@@ -231,64 +231,64 @@ describe("client", () => {
   };
 
   it("reply", async () => {
-    const scope = mockPost(MESSAGING_API_PREFIX, `/message/reply`, {
+    var scope = mockPost(MESSAGING_API_PREFIX, `/message/reply`, {
       messages: [testMsg],
       replyToken: "test_reply_token",
       notificationDisabled: false,
     });
 
-    const res = await client.replyMessage("test_reply_token", testMsg);
+    var res = await client.replyMessage("test_reply_token", testMsg);
     equal(scope.isDone(), true);
     equal(res["x-line-request-id"], "X-Line-Request-Id");
   });
 
   it("validateReplyMessageObjects", async () => {
-    const scope = mockPost(MESSAGING_API_PREFIX, `/message/validate/reply`, {
+    var scope = mockPost(MESSAGING_API_PREFIX, `/message/validate/reply`, {
       messages: [testMsg],
     });
 
-    const res = await client.validateReplyMessageObjects(testMsg);
+    var res = await client.validateReplyMessageObjects(testMsg);
     strictEqual(scope.isDone(), true);
     strictEqual(res["x-line-request-id"], "X-Line-Request-Id");
   });
 
   it("push", async () => {
-    const scope = mockPost(MESSAGING_API_PREFIX, `/message/push`, {
+    var scope = mockPost(MESSAGING_API_PREFIX, `/message/push`, {
       messages: [testMsg],
       to: "test_user_id",
       notificationDisabled: false,
     });
 
-    const res = await client.pushMessage("test_user_id", testMsg);
+    var res = await client.pushMessage("test_user_id", testMsg);
     equal(scope.isDone(), true);
     equal(res["x-line-request-id"], "X-Line-Request-Id");
   });
 
   it("validatePushMessageObjects", async () => {
-    const scope = mockPost(MESSAGING_API_PREFIX, `/message/validate/push`, {
+    var scope = mockPost(MESSAGING_API_PREFIX, `/message/validate/push`, {
       messages: [testMsg],
     });
 
-    const res = await client.validatePushMessageObjects(testMsg);
+    var res = await client.validatePushMessageObjects(testMsg);
     strictEqual(scope.isDone(), true);
     strictEqual(res["x-line-request-id"], "X-Line-Request-Id");
   });
 
   it("multicast", async () => {
-    const ids = ["test_user_id_1", "test_user_id_2", "test_user_id_3"];
-    const scope = mockPost(MESSAGING_API_PREFIX, `/message/multicast`, {
+    var ids = ["test_user_id_1", "test_user_id_2", "test_user_id_3"];
+    var scope = mockPost(MESSAGING_API_PREFIX, `/message/multicast`, {
       messages: [testMsg, testMsg],
       to: ids,
       notificationDisabled: false,
     });
 
-    const res = await client.multicast(ids, [testMsg, testMsg]);
+    var res = await client.multicast(ids, [testMsg, testMsg]);
     equal(scope.isDone(), true);
     equal(res["x-line-request-id"], "X-Line-Request-Id");
   });
 
   it("validateMulticastMessageObjects", async () => {
-    const scope = mockPost(
+    var scope = mockPost(
       MESSAGING_API_PREFIX,
       `/message/validate/multicast`,
       {
@@ -296,7 +296,7 @@ describe("client", () => {
       },
     );
 
-    const res = await client.validateMulticastMessageObjects([
+    var res = await client.validateMulticastMessageObjects([
       testMsg,
       testMsg,
     ]);
@@ -305,7 +305,7 @@ describe("client", () => {
   });
 
   it("narrowcast", async () => {
-    const recipient: Types.ReceieptObject = {
+    var recipient: Types.ReceieptObject = {
       type: "operator",
       and: [
         {
@@ -321,7 +321,7 @@ describe("client", () => {
         },
       ],
     };
-    const filter = {
+    var filter = {
       demographic: {
         type: "operator",
         or: [
@@ -373,17 +373,17 @@ describe("client", () => {
       } as Types.DemographicFilterObject,
     };
 
-    const limit = {
+    var limit = {
       max: 100,
     };
-    const scope = mockPost(MESSAGING_API_PREFIX, `/message/narrowcast`, {
+    var scope = mockPost(MESSAGING_API_PREFIX, `/message/narrowcast`, {
       messages: [testMsg, testMsg],
       recipient,
       filter,
       limit,
     });
 
-    const res = await client.narrowcast(
+    var res = await client.narrowcast(
       [testMsg, testMsg],
       recipient,
       filter,
@@ -394,7 +394,7 @@ describe("client", () => {
   });
 
   it("validateNarrowcastMessageObjects", async () => {
-    const scope = mockPost(
+    var scope = mockPost(
       MESSAGING_API_PREFIX,
       `/message/validate/narrowcast`,
       {
@@ -402,7 +402,7 @@ describe("client", () => {
       },
     );
 
-    const res = await client.validateNarrowcastMessageObjects([
+    var res = await client.validateNarrowcastMessageObjects([
       testMsg,
       testMsg,
     ]);
@@ -411,18 +411,18 @@ describe("client", () => {
   });
 
   it("broadcast", async () => {
-    const scope = mockPost(MESSAGING_API_PREFIX, `/message/broadcast`, {
+    var scope = mockPost(MESSAGING_API_PREFIX, `/message/broadcast`, {
       messages: [testMsg, testMsg],
       notificationDisabled: false,
     });
 
-    const res = await client.broadcast([testMsg, testMsg]);
+    var res = await client.broadcast([testMsg, testMsg]);
     equal(scope.isDone(), true);
     equal(res["x-line-request-id"], "X-Line-Request-Id");
   });
 
   it("validateBroadcastMessageObjects", async () => {
-    const scope = mockPost(
+    var scope = mockPost(
       MESSAGING_API_PREFIX,
       `/message/validate/broadcast`,
       {
@@ -430,7 +430,7 @@ describe("client", () => {
       },
     );
 
-    const res = await client.validateBroadcastMessageObjects([
+    var res = await client.validateBroadcastMessageObjects([
       testMsg,
       testMsg,
     ]);
@@ -440,15 +440,15 @@ describe("client", () => {
 
   describe("validateCustomAggregationUnits", () => {
     it("should validate correctly when input is valid", () => {
-      const units = ["promotion_A1"];
-      const result = client.validateCustomAggregationUnits(units);
+      var units = ["promotion_A1"];
+      var result = client.validateCustomAggregationUnits(units);
       strictEqual(result.valid, true);
       strictEqual(result.messages.length, 0);
     });
 
     it("should return invalid when there is more than one unit", () => {
-      const units = ["promotion_A1", "promotion_A2"];
-      const result = client.validateCustomAggregationUnits(units);
+      var units = ["promotion_A1", "promotion_A2"];
+      var result = client.validateCustomAggregationUnits(units);
       strictEqual(result.valid, false);
       strictEqual(
         result.messages[0],
@@ -457,8 +457,8 @@ describe("client", () => {
     });
 
     it("should return invalid when a unit has more than 30 characters", () => {
-      const units = ["promotion_A1_with_a_very_long_name"];
-      const result = client.validateCustomAggregationUnits(units);
+      var units = ["promotion_A1_with_a_very_long_name"];
+      var result = client.validateCustomAggregationUnits(units);
       strictEqual(result.valid, false);
       strictEqual(
         result.messages[0],
@@ -467,8 +467,8 @@ describe("client", () => {
     });
 
     it("should return invalid when a unit has invalid characters", () => {
-      const units = ["promotion_A1!"];
-      const result = client.validateCustomAggregationUnits(units);
+      var units = ["promotion_A1!"];
+      var result = client.validateCustomAggregationUnits(units);
       strictEqual(result.valid, false);
       strictEqual(
         result.messages[0],
@@ -478,20 +478,20 @@ describe("client", () => {
   });
 
   it("getProfile", async () => {
-    const scope = mockGet(MESSAGING_API_PREFIX, "/profile/test_user_id");
+    var scope = mockGet(MESSAGING_API_PREFIX, "/profile/test_user_id");
 
-    const res = await client.getProfile("test_user_id");
+    var res = await client.getProfile("test_user_id");
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("getGroupMemberProfile", async () => {
-    const scope = mockGet(
+    var scope = mockGet(
       MESSAGING_API_PREFIX,
       "/group/test_group_id/member/test_user_id",
     );
 
-    const res = await client.getGroupMemberProfile(
+    var res = await client.getGroupMemberProfile(
       "test_group_id",
       "test_user_id",
     );
@@ -500,12 +500,12 @@ describe("client", () => {
   });
 
   it("getRoomMemberProfile", async () => {
-    const scope = mockGet(
+    var scope = mockGet(
       MESSAGING_API_PREFIX,
       "/room/test_room_id/member/test_user_id",
     );
 
-    const res = await client.getRoomMemberProfile(
+    var res = await client.getRoomMemberProfile(
       "test_room_id",
       "test_user_id",
     );
@@ -513,28 +513,28 @@ describe("client", () => {
     deepEqual(res, {});
   });
 
-  const mockGroupMemberAPI = () => {
-    const scope = new MSWResult();
+  var mockGroupMemberAPI = () => {
+    var scope = new MSWResult();
     server.use(
       http.get(
         MESSAGING_API_PREFIX + "/:groupOrRoom/:id/members/ids",
         async ({ request }) => {
-          const urlParts = new URL(request.url).pathname.split("/");
-          const groupOrRoom = urlParts[urlParts.length - 4];
-          const id = urlParts[urlParts.length - 3];
+          var urlParts = new URL(request.url).pathname.split("/");
+          var groupOrRoom = urlParts[urlParts.length - 4];
+          var id = urlParts[urlParts.length - 3];
           console.log(
             `url=${
               new URL(request.url).pathname
             } groupOrRoom: ${groupOrRoom}, id: ${id}`,
           );
-          const start =
+          var start =
             parseInt(new URL(request.url).searchParams.get("start"), 10) || 0;
 
-          const memberIds = [start, start + 1, start + 2].map(
+          var memberIds = [start, start + 1, start + 2].map(
             i => `${groupOrRoom}-${id}-${i}`,
           );
 
-          const result: { memberIds: string[]; next?: string } = { memberIds };
+          var result: { memberIds: string[]; next?: string } = { memberIds };
 
           if (start / 3 < 2) {
             result.next = String(start + 3);
@@ -550,9 +550,9 @@ describe("client", () => {
   };
 
   it("getGroupMemberIds", async () => {
-    const scope = mockGroupMemberAPI();
+    var scope = mockGroupMemberAPI();
 
-    const ids = await client.getGroupMemberIds("test_group_id");
+    var ids = await client.getGroupMemberIds("test_group_id");
     equal(scope.isDone(), true);
     deepEqual(ids, [
       "group-test_group_id-0",
@@ -568,9 +568,9 @@ describe("client", () => {
   });
 
   it("getRoomMemberIds", async () => {
-    const scope = mockGroupMemberAPI();
+    var scope = mockGroupMemberAPI();
 
-    const ids = await client.getRoomMemberIds("test_room_id");
+    var ids = await client.getRoomMemberIds("test_room_id");
     equal(scope.isDone(), true);
     deepEqual(ids, [
       "room-test_room_id-0",
@@ -586,14 +586,14 @@ describe("client", () => {
   });
 
   it("getBotFollowersIds", async () => {
-    const scope = mockGet(MESSAGING_API_PREFIX, "/followers/ids?limit=1000");
-    const ids = await client.getBotFollowersIds();
+    var scope = mockGet(MESSAGING_API_PREFIX, "/followers/ids?limit=1000");
+    var ids = await client.getBotFollowersIds();
     equal(scope.isDone(), true);
   });
 
   it("getGroupMembersCount", async () => {
-    const groupId = "groupId";
-    const scope = mockGet(
+    var groupId = "groupId";
+    var scope = mockGet(
       MESSAGING_API_PREFIX,
       `/group/${groupId}/members/count`,
     );
@@ -603,8 +603,8 @@ describe("client", () => {
   });
 
   it("getRoomMembersCount", async () => {
-    const roomId = "roomId";
-    const scope = mockGet(
+    var roomId = "roomId";
+    var scope = mockGet(
       MESSAGING_API_PREFIX,
       `/room/${roomId}/members/count`,
     );
@@ -614,47 +614,47 @@ describe("client", () => {
   });
 
   it("getGroupSummary", async () => {
-    const groupId = "groupId";
-    const scope = mockGet(MESSAGING_API_PREFIX, `/group/${groupId}/summary`);
+    var groupId = "groupId";
+    var scope = mockGet(MESSAGING_API_PREFIX, `/group/${groupId}/summary`);
 
     await client.getGroupSummary(groupId);
     equal(scope.isDone(), true);
   });
 
   it("getMessageContent", async () => {
-    const scope = mockGet(DATA_API_PREFIX, "/message/test_message_id/content");
+    var scope = mockGet(DATA_API_PREFIX, "/message/test_message_id/content");
 
-    const stream = await client.getMessageContent("test_message_id");
-    const data = await getStreamData(stream);
+    var stream = await client.getMessageContent("test_message_id");
+    var data = await getStreamData(stream);
     equal(scope.isDone(), true);
-    const res = JSON.parse(data);
+    var res = JSON.parse(data);
     deepEqual(res, {});
   });
 
   it("leaveGroup", async () => {
-    const scope = mockPost(MESSAGING_API_PREFIX, "/group/test_group_id/leave");
+    var scope = mockPost(MESSAGING_API_PREFIX, "/group/test_group_id/leave");
 
-    const res = await client.leaveGroup("test_group_id");
+    var res = await client.leaveGroup("test_group_id");
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("leaveRoom", async () => {
-    const scope = mockPost(MESSAGING_API_PREFIX, "/room/test_room_id/leave");
-    const res = await client.leaveRoom("test_room_id");
+    var scope = mockPost(MESSAGING_API_PREFIX, "/room/test_room_id/leave");
+    var res = await client.leaveRoom("test_room_id");
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("getRichMenu", async () => {
-    const scope = mockGet(MESSAGING_API_PREFIX, "/richmenu/test_rich_menu_id");
-    const res = await client.getRichMenu("test_rich_menu_id");
+    var scope = mockGet(MESSAGING_API_PREFIX, "/richmenu/test_rich_menu_id");
+    var res = await client.getRichMenu("test_rich_menu_id");
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("createRichMenu", async () => {
-    const scope = mockPost(MESSAGING_API_PREFIX, "/richmenu", richMenu);
+    var scope = mockPost(MESSAGING_API_PREFIX, "/richmenu", richMenu);
     await client.createRichMenu(richMenu);
 
     equal(scope.isDone(), true);
@@ -662,37 +662,37 @@ describe("client", () => {
 
   it("deleteRichMenu", async () => {
     // delete
-    const scope = mockDelete(
+    var scope = mockDelete(
       MESSAGING_API_PREFIX,
       "/richmenu/test_rich_menu_id",
     );
-    const res = await client.deleteRichMenu("test_rich_menu_id");
+    var res = await client.deleteRichMenu("test_rich_menu_id");
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("getRichMenuAliasList", async () => {
-    const scope = mockGet(MESSAGING_API_PREFIX, "/richmenu/alias/list");
-    const res = await client.getRichMenuAliasList();
+    var scope = mockGet(MESSAGING_API_PREFIX, "/richmenu/alias/list");
+    var res = await client.getRichMenuAliasList();
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("getRichMenuAlias", async () => {
-    const richMenuAliasId = "test_rich_menu_alias_id";
-    const scope = mockGet(
+    var richMenuAliasId = "test_rich_menu_alias_id";
+    var scope = mockGet(
       MESSAGING_API_PREFIX,
       `/richmenu/alias/${richMenuAliasId}`,
     );
-    const res = await client.getRichMenuAlias(richMenuAliasId);
+    var res = await client.getRichMenuAlias(richMenuAliasId);
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("createRichMenuAlias", async () => {
-    const richMenuId = "test_rich_menu_id";
-    const richMenuAliasId = "test_rich_menu_alias_id";
-    const scope = mockPost(MESSAGING_API_PREFIX, "/richmenu/alias", {
+    var richMenuId = "test_rich_menu_id";
+    var richMenuAliasId = "test_rich_menu_alias_id";
+    var scope = mockPost(MESSAGING_API_PREFIX, "/richmenu/alias", {
       richMenuId,
       richMenuAliasId,
     });
@@ -702,42 +702,42 @@ describe("client", () => {
   });
 
   it("deleteRichMenuAlias", async () => {
-    const scope = mockDelete(
+    var scope = mockDelete(
       MESSAGING_API_PREFIX,
       "/richmenu/alias/test_rich_menu_alias_id",
     );
-    const res = await client.deleteRichMenuAlias("test_rich_menu_alias_id");
+    var res = await client.deleteRichMenuAlias("test_rich_menu_alias_id");
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("updateRichMenuAlias", async () => {
-    const richMenuId = "test_rich_menu_id";
-    const richMenuAliasId = "test_rich_menu_alias_id";
-    const scope = mockPost(
+    var richMenuId = "test_rich_menu_id";
+    var richMenuAliasId = "test_rich_menu_alias_id";
+    var scope = mockPost(
       MESSAGING_API_PREFIX,
       "/richmenu/alias/test_rich_menu_alias_id",
       { richMenuId },
     );
 
-    const res = await client.updateRichMenuAlias(richMenuAliasId, richMenuId);
+    var res = await client.updateRichMenuAlias(richMenuAliasId, richMenuId);
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("getRichMenuIdOfUser", async () => {
-    const scope = mockGet(MESSAGING_API_PREFIX, "/user/test_user_id/richmenu");
+    var scope = mockGet(MESSAGING_API_PREFIX, "/user/test_user_id/richmenu");
     await client.getRichMenuIdOfUser("test_user_id");
     equal(scope.isDone(), true);
   });
 
   it("linkRichMenuToUser", async () => {
-    const scope = mockPost(
+    var scope = mockPost(
       MESSAGING_API_PREFIX,
       "/user/test_user_id/richmenu/test_rich_menu_id",
     );
 
-    const res = await client.linkRichMenuToUser(
+    var res = await client.linkRichMenuToUser(
       "test_user_id",
       "test_rich_menu_id",
     );
@@ -746,102 +746,102 @@ describe("client", () => {
   });
 
   it("unlinkRichMenuFromUser", async () => {
-    const scope = mockDelete(
+    var scope = mockDelete(
       MESSAGING_API_PREFIX,
       "/user/test_user_id/richmenu",
     );
 
-    const res = await client.unlinkRichMenuFromUser("test_user_id");
+    var res = await client.unlinkRichMenuFromUser("test_user_id");
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("linkRichMenuToMultipleUsers", async () => {
-    const richMenuId = "test_rich_menu_id",
+    var richMenuId = "test_rich_menu_id",
       userIds = ["test_user_id"];
-    const scope = mockPost(MESSAGING_API_PREFIX, "/richmenu/bulk/link", {
+    var scope = mockPost(MESSAGING_API_PREFIX, "/richmenu/bulk/link", {
       richMenuId,
       userIds,
     });
 
-    const res = await client.linkRichMenuToMultipleUsers(richMenuId, userIds);
+    var res = await client.linkRichMenuToMultipleUsers(richMenuId, userIds);
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("unlinkRichMenusFromMultipleUsers", async () => {
-    const userIds = ["test_user_id"];
-    const scope = mockPost(MESSAGING_API_PREFIX, "/richmenu/bulk/unlink", {
+    var userIds = ["test_user_id"];
+    var scope = mockPost(MESSAGING_API_PREFIX, "/richmenu/bulk/unlink", {
       userIds,
     });
 
-    const res = await client.unlinkRichMenusFromMultipleUsers(userIds);
+    var res = await client.unlinkRichMenusFromMultipleUsers(userIds);
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("setRichMenuImage", async () => {
-    const filepath = join(__dirname, "/helpers/line-icon.png");
-    const buffer = readFileSync(filepath);
-    const scope = mockPost(
+    var filepath = join(__dirname, "/helpers/line-icon.png");
+    var buffer = readFileSync(filepath);
+    var scope = mockPost(
       DATA_API_PREFIX,
       "/richmenu/test_rich_menu_id/content",
       buffer,
     );
 
-    const res = await client.setRichMenuImage("test_rich_menu_id", buffer);
+    var res = await client.setRichMenuImage("test_rich_menu_id", buffer);
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("getRichMenuImage", async () => {
-    const scope = mockGet(
+    var scope = mockGet(
       DATA_API_PREFIX,
       "/richmenu/test_rich_menu_id/content",
     );
 
-    const stream = await client.getRichMenuImage("test_rich_menu_id");
-    const data = await getStreamData(stream);
+    var stream = await client.getRichMenuImage("test_rich_menu_id");
+    var data = await getStreamData(stream);
     equal(scope.isDone(), true);
-    const res = JSON.parse(data);
+    var res = JSON.parse(data);
     deepEqual(res, {});
   });
 
   it("getRichMenuList", async () => {
-    const scope = mockGet(MESSAGING_API_PREFIX, "/richmenu/list");
+    var scope = mockGet(MESSAGING_API_PREFIX, "/richmenu/list");
 
     await client.getRichMenuList();
     equal(scope.isDone(), true);
   });
 
   it("setDefaultRichMenu", async () => {
-    const scope = mockPost(
+    var scope = mockPost(
       MESSAGING_API_PREFIX,
       "/user/all/richmenu/test_rich_menu_id",
     );
 
-    const res = await client.setDefaultRichMenu("test_rich_menu_id");
+    var res = await client.setDefaultRichMenu("test_rich_menu_id");
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("getDefaultRichMenuId", async () => {
-    const scope = mockGet(MESSAGING_API_PREFIX, "/user/all/richmenu");
+    var scope = mockGet(MESSAGING_API_PREFIX, "/user/all/richmenu");
 
     await client.getDefaultRichMenuId();
     equal(scope.isDone(), true);
   });
 
   it("deleteDefaultRichMenu", async () => {
-    const scope = mockDelete(MESSAGING_API_PREFIX, "/user/all/richmenu");
+    var scope = mockDelete(MESSAGING_API_PREFIX, "/user/all/richmenu");
 
-    const res = await client.deleteDefaultRichMenu();
+    var res = await client.deleteDefaultRichMenu();
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("getLinkToken", async () => {
-    const scope = mockPost(
+    var scope = mockPost(
       MESSAGING_API_PREFIX,
       "/user/test_user_id/linkToken",
     );
@@ -851,8 +851,8 @@ describe("client", () => {
   });
 
   it("getNumberOfSentReplyMessages", async () => {
-    const date = "20191231";
-    const scope = mockGet(MESSAGING_API_PREFIX, "/message/delivery/reply", {
+    var date = "20191231";
+    var scope = mockGet(MESSAGING_API_PREFIX, "/message/delivery/reply", {
       date,
     });
 
@@ -861,8 +861,8 @@ describe("client", () => {
   });
 
   it("getNumberOfSentPushMessages", async () => {
-    const date = "20191231";
-    const scope = mockGet(MESSAGING_API_PREFIX, "/message/delivery/push", {
+    var date = "20191231";
+    var scope = mockGet(MESSAGING_API_PREFIX, "/message/delivery/push", {
       date,
     });
 
@@ -871,8 +871,8 @@ describe("client", () => {
   });
 
   it("getNumberOfSentMulticastMessages", async () => {
-    const date = "20191231";
-    const scope = mockGet(MESSAGING_API_PREFIX, "/message/delivery/multicast", {
+    var date = "20191231";
+    var scope = mockGet(MESSAGING_API_PREFIX, "/message/delivery/multicast", {
       date,
     });
 
@@ -881,8 +881,8 @@ describe("client", () => {
   });
 
   it("getNarrowcastProgress", async () => {
-    const requestId = "requestId";
-    const scope = mockGet(
+    var requestId = "requestId";
+    var scope = mockGet(
       MESSAGING_API_PREFIX,
       "/message/progress/narrowcast",
       {
@@ -895,22 +895,22 @@ describe("client", () => {
   });
 
   it("getTargetLimitForAdditionalMessages", async () => {
-    const scope = mockGet(MESSAGING_API_PREFIX, "/message/quota");
+    var scope = mockGet(MESSAGING_API_PREFIX, "/message/quota");
 
     await client.getTargetLimitForAdditionalMessages();
     equal(scope.isDone(), true);
   });
 
   it("getNumberOfMessagesSentThisMonth", async () => {
-    const scope = mockGet(MESSAGING_API_PREFIX, "/message/quota/consumption");
+    var scope = mockGet(MESSAGING_API_PREFIX, "/message/quota/consumption");
 
     await client.getNumberOfMessagesSentThisMonth();
     equal(scope.isDone(), true);
   });
 
   it("getNumberOfSentBroadcastMessages", async () => {
-    const date = "20191231";
-    const scope = mockGet(MESSAGING_API_PREFIX, "/message/delivery/broadcast", {
+    var date = "20191231";
+    var scope = mockGet(MESSAGING_API_PREFIX, "/message/delivery/broadcast", {
       date,
     });
 
@@ -919,8 +919,8 @@ describe("client", () => {
   });
 
   it("getNumberOfMessageDeliveries", async () => {
-    const date = "20191231";
-    const scope = mockGet(MESSAGING_API_PREFIX, "/insight/message/delivery", {
+    var date = "20191231";
+    var scope = mockGet(MESSAGING_API_PREFIX, "/insight/message/delivery", {
       date,
     });
 
@@ -929,8 +929,8 @@ describe("client", () => {
   });
 
   it("getNumberOfFollowers", async () => {
-    const date = "20191231";
-    const scope = mockGet(MESSAGING_API_PREFIX, "/insight/followers", {
+    var date = "20191231";
+    var scope = mockGet(MESSAGING_API_PREFIX, "/insight/followers", {
       date,
     });
 
@@ -939,15 +939,15 @@ describe("client", () => {
   });
 
   it("getFriendDemographics", async () => {
-    const scope = mockGet(MESSAGING_API_PREFIX, "/insight/demographic");
+    var scope = mockGet(MESSAGING_API_PREFIX, "/insight/demographic");
 
     await client.getFriendDemographics();
     equal(scope.isDone(), true);
   });
 
   it("getUserInteractionStatistics", async () => {
-    const requestId = "requestId";
-    const scope = mockGet(MESSAGING_API_PREFIX, "/insight/message/event", {
+    var requestId = "requestId";
+    var scope = mockGet(MESSAGING_API_PREFIX, "/insight/message/event", {
       requestId,
     });
 
@@ -956,10 +956,10 @@ describe("client", () => {
   });
 
   it("getStatisticsPerUnit", async () => {
-    const customAggregationUnit = "promotion_a";
-    const from = "20210301";
-    const to = "20210331";
-    const scope = mockGet(
+    var customAggregationUnit = "promotion_a";
+    var from = "20210301";
+    var to = "20210331";
+    var scope = mockGet(
       MESSAGING_API_PREFIX,
       "/insight/message/event/aggregation",
       {
@@ -974,7 +974,7 @@ describe("client", () => {
   });
 
   it("createUploadAudienceGroup", async () => {
-    const requestBody = {
+    var requestBody = {
       description: "audienceGroupName",
       isIfaAudience: false,
       audiences: [
@@ -984,7 +984,7 @@ describe("client", () => {
       ],
       uploadDescription: "uploadDescription",
     };
-    const scope = mockPost(
+    var scope = mockPost(
       MESSAGING_API_PREFIX,
       "/audienceGroup/upload",
       requestBody,
@@ -995,17 +995,17 @@ describe("client", () => {
   });
 
   it("createUploadAudienceGroupByFile", async () => {
-    const filepath = join(__dirname, "/helpers/line-icon.png");
-    const buffer = readFileSync(filepath);
+    var filepath = join(__dirname, "/helpers/line-icon.png");
+    var buffer = readFileSync(filepath);
 
-    const requestBody = {
+    var requestBody = {
       description: "audienceGroupName",
       isIfaAudience: false,
       uploadDescription: "uploadDescription",
       file: buffer,
     };
 
-    const scope = new MSWResult();
+    var scope = new MSWResult();
     server.use(
       http.post(
         DATA_API_PREFIX + "/audienceGroup/upload/byFile",
@@ -1017,9 +1017,9 @@ describe("client", () => {
               .startsWith(`multipart/form-data; boundary=`),
           );
 
-          const blob = await request.blob();
-          const arrayBuffer = await blob.arrayBuffer();
-          const formData = parseForm(arrayBuffer);
+          var blob = await request.blob();
+          var arrayBuffer = await blob.arrayBuffer();
+          var formData = parseForm(arrayBuffer);
           equal(formData["description"], requestBody.description);
           equal(
             formData["isIfaAudience"],
@@ -1042,7 +1042,7 @@ describe("client", () => {
   });
 
   it("updateUploadAudienceGroup", async () => {
-    const requestBody = {
+    var requestBody = {
       audienceGroupId: 4389303728991,
       description: "audienceGroupName",
       uploadDescription: "fileName",
@@ -1055,7 +1055,7 @@ describe("client", () => {
         },
       ],
     };
-    const scope = mockPut(
+    var scope = mockPut(
       MESSAGING_API_PREFIX,
       "/audienceGroup/upload",
       requestBody,
@@ -1066,15 +1066,15 @@ describe("client", () => {
   });
 
   it("updateUploadAudienceGroupByFile", async () => {
-    const filepath = join(__dirname, "/helpers/line-icon.png");
-    const buffer = readFileSync(filepath);
-    const requestBody = {
+    var filepath = join(__dirname, "/helpers/line-icon.png");
+    var buffer = readFileSync(filepath);
+    var requestBody = {
       audienceGroupId: 4389303728991,
       uploadDescription: "fileName",
       file: buffer,
     };
 
-    const scope = new MSWResult();
+    var scope = new MSWResult();
     server.use(
       http.put(
         DATA_API_PREFIX + "/audienceGroup/upload/byFile",
@@ -1085,9 +1085,9 @@ describe("client", () => {
               .get("content-type")
               .startsWith(`multipart/form-data; boundary=`),
           );
-          const blob = await request.blob();
-          const arrayBuffer = await blob.arrayBuffer();
-          const formData = parseForm(arrayBuffer);
+          var blob = await request.blob();
+          var arrayBuffer = await blob.arrayBuffer();
+          var formData = parseForm(arrayBuffer);
           equal(formData["audienceGroupId"], requestBody.audienceGroupId);
           equal(formData["uploadDescription"], requestBody.uploadDescription);
           equal(
@@ -1108,11 +1108,11 @@ describe("client", () => {
   });
 
   it("createClickAudienceGroup", async () => {
-    const requestBody = {
+    var requestBody = {
       description: "audienceGroupName",
       requestId: "requestId",
     };
-    const scope = mockPost(
+    var scope = mockPost(
       MESSAGING_API_PREFIX,
       "/audienceGroup/click",
       requestBody,
@@ -1123,11 +1123,11 @@ describe("client", () => {
   });
 
   it("createImpAudienceGroup", async () => {
-    const requestBody = {
+    var requestBody = {
       requestId: "requestId",
       description: "description",
     };
-    const scope = mockPost(
+    var scope = mockPost(
       MESSAGING_API_PREFIX,
       "/audienceGroup/imp",
       requestBody,
@@ -1138,11 +1138,11 @@ describe("client", () => {
   });
 
   it("setDescriptionAudienceGroup", async () => {
-    const { description, audienceGroupId } = {
+    var { description, audienceGroupId } = {
       description: "description",
       audienceGroupId: "audienceGroupId",
     };
-    const scope = mockPut(
+    var scope = mockPut(
       MESSAGING_API_PREFIX,
       `/audienceGroup/${audienceGroupId}/updateDescription`,
       {
@@ -1155,19 +1155,19 @@ describe("client", () => {
   });
 
   it("deleteAudienceGroup", async () => {
-    const audienceGroupId = "audienceGroupId";
-    const scope = mockDelete(
+    var audienceGroupId = "audienceGroupId";
+    var scope = mockDelete(
       MESSAGING_API_PREFIX,
       `/audienceGroup/${audienceGroupId}`,
     );
-    const res = await client.deleteAudienceGroup(audienceGroupId);
+    var res = await client.deleteAudienceGroup(audienceGroupId);
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("getAudienceGroup", async () => {
-    const audienceGroupId = "audienceGroupId";
-    const scope = mockGet(
+    var audienceGroupId = "audienceGroupId";
+    var scope = mockGet(
       MESSAGING_API_PREFIX,
       `/audienceGroup/${audienceGroupId}`,
     );
@@ -1177,14 +1177,14 @@ describe("client", () => {
   });
 
   it("getAudienceGroups", async () => {
-    const page = 1;
-    const description = "description";
-    const status: Types.AudienceGroupStatus = "READY";
-    const size = 1;
-    const createRoute: Types.AudienceGroupCreateRoute = "MESSAGING_API";
-    const includesExternalPublicGroups = true;
+    var page = 1;
+    var description = "description";
+    var status: Types.AudienceGroupStatus = "READY";
+    var size = 1;
+    var createRoute: Types.AudienceGroupCreateRoute = "MESSAGING_API";
+    var includesExternalPublicGroups = true;
 
-    const scope = mockGet(MESSAGING_API_PREFIX, `/audienceGroup/list`, {
+    var scope = mockGet(MESSAGING_API_PREFIX, `/audienceGroup/list`, {
       page: page.toString(),
       description,
       status,
@@ -1205,7 +1205,7 @@ describe("client", () => {
   });
 
   it("getAudienceGroupAuthorityLevel", async () => {
-    const scope = mockGet(
+    var scope = mockGet(
       MESSAGING_API_PREFIX,
       `/audienceGroup/authorityLevel`,
     );
@@ -1215,8 +1215,8 @@ describe("client", () => {
   });
 
   it("changeAudienceGroupAuthorityLevel", async () => {
-    const authorityLevel: Types.AudienceGroupAuthorityLevel = "PRIVATE";
-    const scope = mockPut(
+    var authorityLevel: Types.AudienceGroupAuthorityLevel = "PRIVATE";
+    var scope = mockPut(
       MESSAGING_API_PREFIX,
       `/audienceGroup/authorityLevel`,
       {
@@ -1229,8 +1229,8 @@ describe("client", () => {
   });
 
   it("setWebhookEndpointUrl", async () => {
-    const endpoint = "https://developers.line.biz/";
-    const scope = mockPut(MESSAGING_API_PREFIX, `/channel/webhook/endpoint`, {
+    var endpoint = "https://developers.line.biz/";
+    var scope = mockPut(MESSAGING_API_PREFIX, `/channel/webhook/endpoint`, {
       endpoint,
     });
 
@@ -1239,15 +1239,15 @@ describe("client", () => {
   });
 
   it("getWebhookEndpointInfo", async () => {
-    const scope = mockGet(MESSAGING_API_PREFIX, `/channel/webhook/endpoint`);
+    var scope = mockGet(MESSAGING_API_PREFIX, `/channel/webhook/endpoint`);
 
     await client.getWebhookEndpointInfo();
     equal(scope.isDone(), true);
   });
 
   it("testWebhookEndpoint", async () => {
-    const endpoint = "https://developers.line.biz/";
-    const scope = mockPost(MESSAGING_API_PREFIX, `/channel/webhook/test`, {
+    var endpoint = "https://developers.line.biz/";
+    var scope = mockPost(MESSAGING_API_PREFIX, `/channel/webhook/test`, {
       endpoint,
     });
 
@@ -1256,15 +1256,15 @@ describe("client", () => {
   });
 
   it("set option once and clear option", async () => {
-    const expectedBody = {
+    var expectedBody = {
       messages: [testMsg],
       to: "test_user_id",
       notificationDisabled: false,
     };
-    const retryKey = "retryKey";
+    var retryKey = "retryKey";
 
-    const firstRequest = new MSWResult();
-    const secondRequest = new MSWResult();
+    var firstRequest = new MSWResult();
+    var secondRequest = new MSWResult();
     server.use(
       http.post(MESSAGING_API_PREFIX + "/message/push", async ({ request }) => {
         checkInterceptionOption(request, interceptionOption);
@@ -1292,10 +1292,10 @@ describe("client", () => {
       retryKey,
     });
 
-    const firstResPromise = client.pushMessage("test_user_id", testMsg);
-    const secondResPromise = client.pushMessage("test_user_id", testMsg);
+    var firstResPromise = client.pushMessage("test_user_id", testMsg);
+    var secondResPromise = client.pushMessage("test_user_id", testMsg);
 
-    const [firstRes, secondRes] = await Promise.all([
+    var [firstRes, secondRes] = await Promise.all([
       firstResPromise,
       secondResPromise,
     ]);
@@ -1324,14 +1324,14 @@ describe("client", () => {
   });
 
   it("getBotInfo", async () => {
-    const scope = mockGet(MESSAGING_API_PREFIX, `/info`);
+    var scope = mockGet(MESSAGING_API_PREFIX, `/info`);
 
     await client.getBotInfo();
     equal(scope.isDone(), true);
   });
 
   it("validateRichMenu", async () => {
-    const scope = mockPost(
+    var scope = mockPost(
       MESSAGING_API_PREFIX,
       `/richmenu/validate`,
       richMenu,
@@ -1342,9 +1342,9 @@ describe("client", () => {
   });
 });
 
-const oauth = new OAuth();
+var oauth = new OAuth();
 describe("oauth", () => {
-  const server = setupServer();
+  var server = setupServer();
   beforeAll(() => {
     server.listen();
   });
@@ -1355,23 +1355,23 @@ describe("oauth", () => {
     server.resetHandlers();
   });
 
-  const interceptionOption: Record<string, string> = {
+  var interceptionOption: Record<string, string> = {
     "content-type": "application/x-www-form-urlencoded",
     "User-Agent": "@line/bot-sdk/1.0.0-test",
   };
   it("issueAccessToken", async () => {
-    const client_id = "test_client_id";
-    const client_secret = "test_client_secret";
-    const reply = {
+    var client_id = "test_client_id";
+    var client_secret = "test_client_secret";
+    var reply = {
       access_token: "access_token",
       expires_in: 2592000,
       token_type: "Bearer",
     };
 
-    const scope = new MSWResult();
+    var scope = new MSWResult();
     server.use(
       http.post(OAUTH_BASE_PREFIX + "/accessToken", async ({ request }) => {
-        const dat = new URLSearchParams(await request.text());
+        var dat = new URLSearchParams(await request.text());
         deepEqual(Object.fromEntries(dat.entries()), {
           grant_type: "client_credentials",
           client_id,
@@ -1382,19 +1382,19 @@ describe("oauth", () => {
       }),
     );
 
-    const res = await oauth.issueAccessToken(client_id, client_secret);
+    var res = await oauth.issueAccessToken(client_id, client_secret);
     equal(scope.isDone(), true);
     deepEqual(res, reply);
   });
 
   it("revokeAccessToken", async () => {
-    const access_token = "test_channel_access_token";
+    var access_token = "test_channel_access_token";
 
-    const scope = new MSWResult();
+    var scope = new MSWResult();
     server.use(
       http.post(OAUTH_BASE_PREFIX + "/revoke", async ({ request }) => {
         checkInterceptionOption(request, interceptionOption);
-        const dat = new URLSearchParams(await request.text());
+        var dat = new URLSearchParams(await request.text());
         deepEqual(Object.fromEntries(dat.entries()), {
           access_token,
         });
@@ -1403,39 +1403,39 @@ describe("oauth", () => {
       }),
     );
 
-    const res = await oauth.revokeAccessToken(access_token);
+    var res = await oauth.revokeAccessToken(access_token);
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("verifyAccessToken", async () => {
-    const access_token = "test_channel_access_token";
-    const scope = new MSWResult();
+    var access_token = "test_channel_access_token";
+    var scope = new MSWResult();
     server.use(
       http.get(OAUTH_BASE_PREFIX_V2_1 + "/verify", async ({ request }) => {
-        const query = new URL(request.url).searchParams;
+        var query = new URL(request.url).searchParams;
         equal(query.get("access_token"), access_token);
         scope.done();
         return HttpResponse.json({});
       }),
     );
 
-    const res = await oauth.verifyAccessToken(access_token);
+    var res = await oauth.verifyAccessToken(access_token);
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("verifyIdToken", async () => {
-    const id_token = "test_channel_access_token";
-    const client_id = "test_client_id";
-    const nonce = "test_nonce";
-    const user_id = "test_user_id";
+    var id_token = "test_channel_access_token";
+    var client_id = "test_client_id";
+    var nonce = "test_nonce";
+    var user_id = "test_user_id";
 
-    const scope = new MSWResult();
+    var scope = new MSWResult();
     server.use(
       http.post(OAUTH_BASE_PREFIX_V2_1 + "/verify", async ({ request }) => {
         checkInterceptionOption(request, interceptionOption);
-        const dat = new URLSearchParams(await request.text());
+        var dat = new URLSearchParams(await request.text());
         deepEqual(Object.fromEntries(dat.entries()), {
           id_token,
           client_id,
@@ -1447,25 +1447,25 @@ describe("oauth", () => {
       }),
     );
 
-    const res = await oauth.verifyIdToken(id_token, client_id, nonce, user_id);
+    var res = await oauth.verifyIdToken(id_token, client_id, nonce, user_id);
     equal(scope.isDone(), true);
     deepEqual(res, {});
   });
 
   it("issueChannelAccessTokenV2_1", async () => {
-    const client_assertion = "client_assertion";
-    const reply = {
+    var client_assertion = "client_assertion";
+    var reply = {
       access_token: "access_token",
       expires_in: 2592000,
       token_type: "Bearer",
       key_id: "key_id",
     };
 
-    const scope = new MSWResult();
+    var scope = new MSWResult();
     server.use(
       http.post(OAUTH_BASE_PREFIX_V2_1 + "/token", async ({ request }) => {
         checkInterceptionOption(request, interceptionOption);
-        const dat = new URLSearchParams(await request.text());
+        var dat = new URLSearchParams(await request.text());
         deepEqual(Object.fromEntries(dat.entries()), {
           grant_type: "client_credentials",
           client_assertion_type:
@@ -1477,22 +1477,22 @@ describe("oauth", () => {
       }),
     );
 
-    const res = await oauth.issueChannelAccessTokenV2_1(client_assertion);
+    var res = await oauth.issueChannelAccessTokenV2_1(client_assertion);
     equal(scope.isDone(), true);
     deepEqual(res, reply);
   });
 
   it("getChannelAccessTokenKeyIdsV2_1", async () => {
-    const client_assertion = "client_assertion";
-    const reply = {
+    var client_assertion = "client_assertion";
+    var reply = {
       key_ids: ["key_id"],
     };
 
-    const scope = new MSWResult();
+    var scope = new MSWResult();
     server.use(
       http.get(OAUTH_BASE_PREFIX_V2_1 + "/tokens/kid", async ({ request }) => {
-        const query = new URL(request.url).searchParams;
-        for (const [key, value] of Object.entries({
+        var query = new URL(request.url).searchParams;
+        for (var [key, value] of Object.entries({
           client_assertion_type:
             "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
           client_assertion,
@@ -1504,21 +1504,21 @@ describe("oauth", () => {
       }),
     );
 
-    const res = await oauth.getChannelAccessTokenKeyIdsV2_1(client_assertion);
+    var res = await oauth.getChannelAccessTokenKeyIdsV2_1(client_assertion);
     equal(scope.isDone(), true);
     deepEqual(res, reply);
   });
 
   it("revokeChannelAccessTokenV2_1", async () => {
-    const client_id = "test_client_id",
+    var client_id = "test_client_id",
       client_secret = "test_client_secret",
       access_token = "test_channel_access_token";
-    const scope = new MSWResult();
+    var scope = new MSWResult();
     server.use(
       http.post(OAUTH_BASE_PREFIX_V2_1 + "/revoke", async ({ request }) => {
         checkInterceptionOption(request, interceptionOption);
 
-        const params = new URLSearchParams(await request.text());
+        var params = new URLSearchParams(await request.text());
         ok(params);
         equal(params.get("client_id"), client_id);
         equal(params.get("client_secret"), client_secret);
@@ -1528,7 +1528,7 @@ describe("oauth", () => {
       }),
     );
 
-    const res = await oauth.revokeChannelAccessTokenV2_1(
+    var res = await oauth.revokeChannelAccessTokenV2_1(
       client_id,
       client_secret,
       access_token,
