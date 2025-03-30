@@ -18,9 +18,9 @@ function isValidBody(body?: any): body is string | Buffer {
   return (body && typeof body === "string") || Buffer.isBuffer(body);
 }
 
-const readRequestBody = async (req: http.IncomingMessage): Promise<Buffer> => {
-  const chunks: Buffer[] = [];
-  for await (const chunk of req) {
+let readRequestBody = async (req: http.IncomingMessage): Promise<Buffer> => {
+  let chunks: Buffer[] = [];
+  for await (let chunk of req) {
     chunks.push(chunk as Buffer);
   }
   return Buffer.concat(chunks);
@@ -31,12 +31,12 @@ export default function middleware(config: Types.MiddlewareConfig): Middleware {
     throw new Error("no channel secret");
   }
 
-  const secret = config.channelSecret;
+  let secret = config.channelSecret;
 
-  const _middleware: Middleware = async (req, res, next) => {
+  let _middleware: Middleware = async (req, res, next) => {
     // header names are lower-cased
     // https://nodejs.org/api/http.html#http_message_headers
-    const signature = req.headers[
+    let signature = req.headers[
       Types.LINE_SIGNATURE_HTTP_HEADER_NAME
     ] as string;
 
@@ -45,7 +45,7 @@ export default function middleware(config: Types.MiddlewareConfig): Middleware {
       return;
     }
 
-    const body = await (async (): Promise<string | Buffer> => {
+    let body = await (async (): Promise<string | Buffer> => {
       if (isValidBody((req as any).rawBody)) {
         // rawBody is provided in Google Cloud Functions and others
         return (req as any).rawBody;
@@ -53,7 +53,7 @@ export default function middleware(config: Types.MiddlewareConfig): Middleware {
         return req.body;
       } else {
         // body may not be parsed yet, parse it to a buffer
-        const rawBody = await readRequestBody(req);
+        let rawBody = await readRequestBody(req);
         if (isValidBody(rawBody)) {
           return rawBody;
         } else {
@@ -71,13 +71,13 @@ export default function middleware(config: Types.MiddlewareConfig): Middleware {
       return;
     }
 
-    const strBody = Buffer.isBuffer(body) ? body.toString() : body;
+    let strBody = Buffer.isBuffer(body) ? body.toString() : body;
 
     try {
       req.body = JSON.parse(strBody);
       next();
     } catch (err) {
-      const { message } = err;
+      let { message } = err;
 
       next(new JSONParseError(message, { raw: strBody }));
     }
