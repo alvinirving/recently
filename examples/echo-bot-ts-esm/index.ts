@@ -11,25 +11,25 @@ import {
 import express, {Application, Request, Response} from 'express';
 
 // Setup all LINE client and Express configurations.
-let clientConfig: ClientConfig = {
+const clientConfig: ClientConfig = {
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN || '',
 };
 
-let middlewareConfig: MiddlewareConfig = {
+const middlewareConfig: MiddlewareConfig = {
   channelSecret: process.env.CHANNEL_SECRET || '',
 };
 
-let PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 // Create a new LINE SDK client.
-let client = new messagingApi.MessagingApiClient(clientConfig);
+const client = new messagingApi.MessagingApiClient(clientConfig);
 
 // Create a new Express application.
-let app: Application = express();
+const app: Application = express();
 
 
 // Function handler to receive the text.
-let textEventHandler = async (event: webhook.Event): Promise<MessageAPIResponseBase | undefined> => {
+const textEventHandler = async (event: webhook.Event): Promise<MessageAPIResponseBase | undefined> => {
   // Process all variables here.
 
   // Check if for a text message
@@ -74,11 +74,11 @@ app.post(
   '/callback',
   middleware(middlewareConfig),
   async (req: Request, res: Response): Promise<Response> => {
-    let callbackRequest: webhook.CallbackRequest = req.body;
-    let events: webhook.Event[] = callbackRequest.events!;
+    const callbackRequest: webhook.CallbackRequest = req.body;
+    const events: webhook.Event[] = callbackRequest.events!;
 
     // Process all the received events asynchronously.
-    let results = await Promise.all(
+    const results = await Promise.all(
       events.map(async (event: webhook.Event) => {
         try {
           await textEventHandler(event);
