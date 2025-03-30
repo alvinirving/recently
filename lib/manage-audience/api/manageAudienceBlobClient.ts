@@ -35,7 +35,7 @@ export class ManageAudienceBlobClient {
   private httpClient: HTTPFetchClient;
 
   constructor(config: httpClientConfig) {
-    const baseURL = config.baseURL || "https://api-data.line.me";
+    var baseURL = config.baseURL || "https://api-data.line.me";
     this.httpClient = new HTTPFetchClient({
       defaultHeaders: {
         Authorization: "Bearer " + config.channelAccessToken,
@@ -45,7 +45,7 @@ export class ManageAudienceBlobClient {
   }
 
   private async parseHTTPResponse(response: Response) {
-    const { LINE_REQUEST_ID_HTTP_HEADER_NAME } = Types;
+    var { LINE_REQUEST_ID_HTTP_HEADER_NAME } = Types;
     let resBody: Record<string, any> = {
       ...(await response.json()),
     };
@@ -93,17 +93,17 @@ export class ManageAudienceBlobClient {
     audienceGroupId?: number,
     uploadDescription?: string,
   ): Promise<Types.ApiResponseType<Types.MessageAPIResponseBase>> {
-    const form = new FormData();
+    var form = new FormData();
     form.append("audienceGroupId", String(audienceGroupId));
     form.append("uploadDescription", String(uploadDescription));
     form.append("file", file); // file
 
-    const res = await this.httpClient.putFormMultipart(
+    var res = await this.httpClient.putFormMultipart(
       "/v2/bot/audienceGroup/upload/byFile",
       form,
     );
-    const text = await res.text();
-    const parsedBody = text ? JSON.parse(text) : null;
+    var text = await res.text();
+    var parsedBody = text ? JSON.parse(text) : null;
     return { httpResponse: res, body: parsedBody };
   }
   /**
@@ -147,18 +147,18 @@ export class ManageAudienceBlobClient {
     isIfaAudience?: boolean,
     uploadDescription?: string,
   ): Promise<Types.ApiResponseType<CreateAudienceGroupResponse>> {
-    const form = new FormData();
+    var form = new FormData();
     form.append("description", String(description));
     form.append("isIfaAudience", String(isIfaAudience));
     form.append("uploadDescription", String(uploadDescription));
     form.append("file", file); // file
 
-    const res = await this.httpClient.postFormMultipart(
+    var res = await this.httpClient.postFormMultipart(
       "/v2/bot/audienceGroup/upload/byFile",
       form,
     );
-    const text = await res.text();
-    const parsedBody = text ? JSON.parse(text) : null;
+    var text = await res.text();
+    var parsedBody = text ? JSON.parse(text) : null;
     return { httpResponse: res, body: parsedBody };
   }
 }
