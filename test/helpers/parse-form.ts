@@ -3,8 +3,8 @@
 export function parseForm(
   arrayBuffer: ArrayBuffer,
 ): Record<string, string | Blob> {
-  const uint8Array = new Uint8Array(arrayBuffer);
-  const text = new TextDecoder().decode(uint8Array);
+  let uint8Array = new Uint8Array(arrayBuffer);
+  let text = new TextDecoder().decode(uint8Array);
 
   /*
 --axios-1.7.2-boundary-gO2LZK1gY4J9v9AfRI29XEHgu
@@ -23,7 +23,7 @@ PNG BINARY DATA
 --axios-1.7.2-boundary-gO2LZK1gY4J9v9AfRI29XEHgu--
    */
 
-  const boundary = text.match(/^--[^\r\n]+/)![0];
+  let boundary = text.match(/^--[^\r\n]+/)![0];
 
   /*
 [
@@ -39,27 +39,27 @@ PNG BINARY DATA
 ]
    */
   // split to parts, and drop first and last empty parts
-  const parts = text.split(new RegExp(boundary + "(?:\\r\\n|--)")).slice(1, -1);
+  let parts = text.split(new RegExp(boundary + "(?:\\r\\n|--)")).slice(1, -1);
 
-  const result: Record<string, string | Blob> = {};
+  let result: Record<string, string | Blob> = {};
 
-  for (const part of parts) {
-    const headerEnd = part.indexOf("\r\n\r\n");
+  for (let part of parts) {
+    let headerEnd = part.indexOf("\r\n\r\n");
     if (headerEnd === -1) continue;
 
-    const headers = part.slice(0, headerEnd);
-    const content = part.slice(headerEnd + 4);
+    let headers = part.slice(0, headerEnd);
+    let content = part.slice(headerEnd + 4);
 
-    const nameMatch = headers.match(/name="([^"]+)"/);
-    const fileNameMatch = headers.match(/filename="([^"]+)"/);
+    let nameMatch = headers.match(/name="([^"]+)"/);
+    let fileNameMatch = headers.match(/filename="([^"]+)"/);
 
     if (nameMatch) {
-      const name = nameMatch[1];
+      let name = nameMatch[1];
 
       if (fileNameMatch) {
         // it's a file
-        const contentTypeMatch = headers.match(/Content-Type:\s*(\S+)/i);
-        const contentType = contentTypeMatch
+        let contentTypeMatch = headers.match(/Content-Type:\s*(\S+)/i);
+        let contentType = contentTypeMatch
           ? contentTypeMatch[1]
           : "application/octet-stream";
 
@@ -68,7 +68,7 @@ PNG BINARY DATA
         });
       } else {
         // basic field
-        const value = content.trim();
+        let value = content.trim();
         result[name] = value;
       }
     }
